@@ -26,6 +26,7 @@ endif()
 file(GLOB SOURCES *.cpp)
 
 # find_package(GTest REQUIRED)
+include(GoogleTest)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${FILTER_LIB_INCLUDE_DIRS})
