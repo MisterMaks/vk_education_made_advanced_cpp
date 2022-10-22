@@ -60,12 +60,12 @@ jobs:
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
       # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
       working-directory: ${{github.workspace}}/homework_1
-      run: cmake -B ${{github.workspace}}/homework_1/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+      run: cmake -DUSE_SANITIZER=ON -B ${{github.workspace}}/homework_1/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
 
     - name: Build
       # Build your program with the given configuration
       working-directory: ${{github.workspace}}/homework_1
-      run: cmake -DUSE_SANITIZER=ON --build ${{github.workspace}}/homework_1/build --config ${{env.BUILD_TYPE}}
+      run: cmake --build ${{github.workspace}}/homework_1/build --config ${{env.BUILD_TYPE}}
 
     - name: Test
       working-directory: ${{github.workspace}}/homework_1/build
