@@ -28,7 +28,7 @@ jobs:
 
     - name: Run linter cpplint
       working-directory: ${{github.workspace}}/homework_1
-      run: cpplint --extensions=c --filter=-whitespace,-legal/copyright,-readability/casting ./*
+      run: cpplint --extensions=c,cpp,h --filter=-whitespace,-legal/copyright,-readability/casting,-build/include_subdir,-build/header_guard ./*.[c,cpp,h] filter_lib/*.[c,cpp,h] tests/*.[c,cpp,h]
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
