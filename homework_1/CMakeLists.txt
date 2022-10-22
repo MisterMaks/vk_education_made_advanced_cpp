@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(homework_1 VERSION 0.1.0)
 
-option(USE_SANITIZER "Should i use sanitizer" OFF)
+option(USE_SANITIZER "Should i use sanitizer" ON)
 
 add_subdirectory(filter_lib)
 
