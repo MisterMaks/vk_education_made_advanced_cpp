@@ -16,7 +16,7 @@ int main() {
     printf("Input attr value in 'src' tag: ");
     scanf("%s", attr);
 
-    while ((getchar()) != '\n');
+    while ((getchar()) != '\n') {}
 
     char **lines = (char**)calloc(count_lines, sizeof(char*));
     printf("Input text line by line:\n");
