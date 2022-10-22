@@ -17,26 +17,30 @@ struct TestCase {
 };
 
 TestCase *get_test_case(int num, int count_lines, char *text, char *attr, int true_return_value) {
-    TestCase *test_case = (TestCase*)malloc(sizeof(TestCase));
+    TestCase *test_case = (TestCase*)calloc(1, sizeof(TestCase));
     test_case->num = num;
     test_case->count_lines = count_lines;
     test_case->attr = attr;
     test_case->true_return_value = true_return_value;
-    test_case->lines = (char**)malloc(count_lines * sizeof(char*));
-    test_case->filtered_lines = (FilteredLines*)malloc(sizeof(FilteredLines));
-    test_case->filtered_lines->lines = (char**)malloc(count_lines * sizeof(char*));
+    test_case->lines = (char**)calloc(count_lines, sizeof(char*));
+    test_case->filtered_lines = (FilteredLines*)calloc(1, sizeof(FilteredLines));
+    test_case->filtered_lines->lines = (char**)calloc(count_lines, sizeof(char*));
 
     int i = 0;
     int j = 0;
-    while (text[i+j] != *"\0") {
-        test_case->lines[i] = (char*)malloc(DEFAULT_LEN_STR*sizeof(char));
-        int z = 0;
-        while (text[i+j] != *"\n") {
-            test_case->lines[i][z] = text[i+j];
-            j++;
-            z++;
+    int z = 0;
+    while (text[z] != *"\0") {
+        if (j == 0) {
+            test_case->lines[i] = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
         }
-        i++;
+        if (text[z] != *"\n") {
+            test_case->lines[i][j] = text[z];
+            j++;
+        } else {
+            j = 0;
+            i++;
+        }
+        z++; 
     };
 
     test_case->count_lines = i;
@@ -58,6 +62,12 @@ TEST(Filter, TestBasics) {
         printf("Test %d ...\n", test_case->num);
         EXPECT_EQ(test_case->true_return_value, filter(test_case->lines, test_case->count_lines, test_case->attr, test_case->filtered_lines));
         printf("\n");
+        for (int i = 0; i < test_case->count_lines; ++i) {
+            free(test_case->lines[i]);
+        }
+        free(test_case->lines);
+        free(test_case->filtered_lines->lines);
+        free(test_case->filtered_lines);
         free(test_case);
     }
 }

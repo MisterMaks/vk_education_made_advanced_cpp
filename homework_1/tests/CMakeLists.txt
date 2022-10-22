@@ -16,7 +16,12 @@ FetchContent_Declare(
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
+if(USE_SANITIZER)
+set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fsanitize=address,undefined -fno-sanitize-recover=all -fsanitize-undefined-trap-on-error -fprofile-arcs -ftest-coverage -O0 -g")
+else()
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} "-fprofile-arcs -ftest-coverage -O0")
+endif()
+
 if(WITH_COVERAGE)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -coverage -lgcov" )
 else()
