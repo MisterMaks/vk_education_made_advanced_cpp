@@ -7,7 +7,7 @@ static const int DEFAULT_LEN_STR = 1024;
 
 int filter(char **lines, int count_lines, char *attr, FilteredLines *filtered_lines) {
     char *search_line = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
-    sprintf(search_line, "src=\"%s\"", attr);
+    snprintf(search_line, DEFAULT_LEN_STR*sizeof(char), "src=\"%s\"", attr);
     for (int i = 0; i < count_lines; ++i) {
         if (strstr(lines[i], search_line) != NULL) {
             int count = filtered_lines->count;

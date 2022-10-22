@@ -41,7 +41,7 @@ TestCase *get_test_case(int num, int count_lines, char *text, char *attr, int tr
             i++;
         }
         z++; 
-    };
+    }
 
     test_case->count_lines = i;
     
