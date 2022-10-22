@@ -40,7 +40,7 @@ jobs:
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
       run: ctest -C ${{env.BUILD_TYPE}}
 
-    - name: Run valgring
+    - name: Run valgrind
       working-directory: ${{github.workspace}}/homework_1/build
       run: valgrind --tool=memcheck --leak-check=yes ./tests/test_filter
       
