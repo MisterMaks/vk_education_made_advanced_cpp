@@ -15,7 +15,9 @@ int filter(char **const lines, const int count_lines, char *attr, FilteredLines 
     if (!attr[0]) {
         return -1;
     }
-    filtered_lines = realloc(filtered_lines, sizeof(FilteredLines));
+    if (!filtered_lines) {
+        return -1;
+    }
     filtered_lines->lines = realloc(filtered_lines->lines, count_lines*sizeof(char*));
     char *search_line = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
     snprintf(search_line, DEFAULT_LEN_STR*sizeof(char), "src=\"%s\"", attr);
