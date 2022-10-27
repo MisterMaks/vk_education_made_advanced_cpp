@@ -33,24 +33,6 @@ void input(InputLines *input_lines) {
 }
 
 int main() {
-    // int count_lines;
-    // printf("Input count lines of text: ");
-    // scanf("%d", &count_lines);
-
-    // char *attr = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));;
-    // printf("Input attr value in 'src' tag: ");
-    // scanf("%" STR(DEFAULT_LEN_STR) "s", attr);
-
-    // while ((getchar()) != '\n') {}
-
-    // char **lines = (char**)calloc(count_lines, sizeof(char*));
-    // printf("Input text line by line:\n");
-    // for (int i = 0; i < count_lines; ++i) {
-    //     printf("%d. ", i+1);
-    //     lines[i] = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
-    //     scanf("%" STR(DEFAULT_LEN_STR) "[^\n]", lines[i]);
-    // }
-
     InputLines *input_lines = calloc(1, sizeof(InputLines));
     input_lines->attr = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
     input_lines->lines = (char**)calloc(input_lines->count, sizeof(char*));
