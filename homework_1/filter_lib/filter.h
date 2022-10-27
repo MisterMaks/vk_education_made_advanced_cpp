@@ -7,6 +7,6 @@ struct FilteredLines {
     char **lines;
 };
 
-int filter(char **lines, int count_lines, char *attr, FilteredLines *filtered_lines);
+int filter(char **const lines, const int count_lines, char *attr, FilteredLines *filtered_lines);
 
 #endif // FILTER_H

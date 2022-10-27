@@ -17,14 +17,18 @@ struct InputLines {
     char **lines;
 };
 
-void input(InputLines *input_lines) {
+InputLines *input() {
+    InputLines *input_lines = calloc(1, sizeof(FilteredLines));
+
     printf("Input count lines of text: ");
     scanf("%" STR(DEFAULT_LEN_STR) "s", input_lines->count);
 
     printf("Input attr value in 'src' tag: ");
+    input_lines->attr = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
     scanf("%" STR(DEFAULT_LEN_STR) "s", input_lines->attr);
 
     printf("Input text line by line:\n");
+    input_lines->lines = (char**)calloc(input_lines->count, sizeof(char*));
     for (int i = 0; i < input_lines->count; ++i) {
         printf("%d. ", i+1);
         input_lines->lines[i] = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
@@ -33,10 +37,7 @@ void input(InputLines *input_lines) {
 }
 
 int main() {
-    InputLines *input_lines = calloc(1, sizeof(InputLines));
-    input_lines->attr = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
-    input_lines->lines = (char**)calloc(input_lines->count, sizeof(char*));
-    input(input_lines);
+    InputLines *input_lines = input();
 
     FilteredLines *filtered_lines = calloc(1, sizeof(FilteredLines));
     filtered_lines->lines = (char**)calloc(input_lines->count, sizeof(char*));
