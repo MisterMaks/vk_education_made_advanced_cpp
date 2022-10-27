@@ -40,6 +40,11 @@ int main() {
 
     int count_filtered_lines = filter(input_lines->lines, input_lines->count, input_lines->attr, filtered_lines);
 
+    if (count_filtered_lines < 0) {
+        printf("\nError in filter(). Check input data");
+        return 0;
+    }
+    
     printf("\nCount filtered lines: %d\n", count_filtered_lines);
 
     // DEBUG
