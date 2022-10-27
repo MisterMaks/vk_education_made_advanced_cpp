@@ -4,38 +4,62 @@
 
 #include "filter.h"
 
+#define STR2(x) #x
+#define STR(X) STR2(X)
+
 const int DEFAULT_LEN_STR = 1024;
 const int ASCII_CODE_LINE_BREAK = 10;
 
-int main() {
-    int count_lines;
+typedef struct InputLines InputLines;
+struct InputLines {
+    int count;
+    char *attr;
+    char **lines;
+};
+
+void input(InputLines *input_lines) {
     printf("Input count lines of text: ");
-    scanf("%d", &count_lines);
+    scanf("%" STR(DEFAULT_LEN_STR) "s", input_lines->count);
 
-    char *attr = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));;
     printf("Input attr value in 'src' tag: ");
-    scanf("%s", attr);
+    scanf("%" STR(DEFAULT_LEN_STR) "s", input_lines->attr);
 
-    while ((getchar()) != '\n') {}
-
-    char **lines = (char**)calloc(count_lines, sizeof(char*));
     printf("Input text line by line:\n");
-    for (int i = 0; i < count_lines; ++i) {
-        lines[i] = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
-        char ch;
-        int j = 0;
-        int num_line = i + 1;
-        printf("%d. ", num_line);
-        while ((ch = getchar()) != *"\n") {
-            lines[i][j] = ch;
-            j++;
-        }
-    }
+    for (int i = 0; i < input_lines->count; ++i) {
+        printf("%d. ", i+1);
+        input_lines->lines[i] = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
+        scanf("%" STR(DEFAULT_LEN_STR) "[^\n]", input_lines->lines[i]);
+    } 
+}
+
+int main() {
+    // int count_lines;
+    // printf("Input count lines of text: ");
+    // scanf("%d", &count_lines);
+
+    // char *attr = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));;
+    // printf("Input attr value in 'src' tag: ");
+    // scanf("%" STR(DEFAULT_LEN_STR) "s", attr);
+
+    // while ((getchar()) != '\n') {}
+
+    // char **lines = (char**)calloc(count_lines, sizeof(char*));
+    // printf("Input text line by line:\n");
+    // for (int i = 0; i < count_lines; ++i) {
+    //     printf("%d. ", i+1);
+    //     lines[i] = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
+    //     scanf("%" STR(DEFAULT_LEN_STR) "[^\n]", lines[i]);
+    // }
+
+    InputLines *input_lines = calloc(1, sizeof(InputLines));
+    input_lines->attr = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
+    input_lines->lines = (char**)calloc(input_lines->count, sizeof(char*));
+    input(input_lines);
 
     FilteredLines *filtered_lines = calloc(1, sizeof(FilteredLines));
-    filtered_lines->lines = (char**)calloc(count_lines, sizeof(char*));
+    filtered_lines->lines = (char**)calloc(input_lines->count, sizeof(char*));
 
-    int count_filtered_lines = filter(lines, count_lines, attr, filtered_lines);
+    int count_filtered_lines = filter(input_lines->lines, input_lines->count, input_lines->attr, filtered_lines);
 
     printf("\nCount filtered lines: %d\n", count_filtered_lines);
 
@@ -44,13 +68,13 @@ int main() {
     //     printf("%s\n", filtered_lines->lines[i]);
     // }
 
-    for (int i = 0; i < count_lines; ++i) {
-        free(lines[i]);
+    for (int i = 0; i < input_lines->count; ++i) {
+        free(input_lines->lines[i]);
     }
-    free(lines);
+    free(input_lines->lines);
     free(filtered_lines->lines);
     free(filtered_lines);
-    free(attr);
+    free(input_lines->attr);
 
     return 0;
 }
