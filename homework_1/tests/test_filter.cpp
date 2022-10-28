@@ -27,11 +27,11 @@ TestCase *get_test_case(int num, int count_lines, char *text, char *attr, int tr
         return test_case;
     }
     test_case->filtered_lines->lines = (char**)calloc(count_lines, sizeof(char*));
-    test_case->lines = (char**)calloc(count_lines, sizeof(char*));
     if (!text) {
         test_case->lines = NULL;
         return test_case;
     } 
+    test_case->lines = (char**)calloc(count_lines, sizeof(char*));
 
     int i = 0;
     int j = 0;
