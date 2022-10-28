@@ -9,10 +9,10 @@ int filter(char **const lines, const int count_lines, char *attr, FilteredLines 
     if (count_lines <= 0) {
         return -1;
     }
-    if (!lines[count_lines-1]) {
+    if (!lines || !lines[0] || !lines[count_lines-1]) {
         return -1;
     }
-    if (!attr[0]) {
+    if (!attr) {
         return -1;
     }
     if (!filtered_lines) {
@@ -22,7 +22,7 @@ int filter(char **const lines, const int count_lines, char *attr, FilteredLines 
     char *search_line = (char*)calloc(DEFAULT_LEN_STR, sizeof(char));
     snprintf(search_line, DEFAULT_LEN_STR*sizeof(char), "src=\"%s\"", attr);
     for (int i = 0; i < count_lines; ++i) {
-        if (strstr(lines[i], search_line) != NULL) {
+        if (lines[i] && strstr(lines[i], search_line) != NULL) {
             int count = filtered_lines->count;
             filtered_lines->lines[count] = lines[i];
             filtered_lines->count++;
