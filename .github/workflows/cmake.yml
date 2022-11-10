@@ -1,0 +1,128 @@
+name: Build homework_1
+
+on:
+  push
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build_homework_1_with_valgrind_and_linters:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+
+    # container: leshiy1295/gcc_linters
+    
+    steps:
+    - uses: actions/checkout@v3
+    - uses: lukka/get-cmake@latest
+
+    - name: Apt install
+      run: sudo apt update && sudo apt install -y valgrind
+    
+    - name: Pip install
+      run: pip install cpplint
+
+    - name: Run linter cpplint
+      working-directory: ${{github.workspace}}/homework_1
+      run: cpplint --extensions=c,cpp,h --filter=-whitespace,-legal/copyright,-readability/casting,-build/include_subdir,-build/header_guard ./*.[c,cpp,h] filter_lib/*.[c,cpp,h] tests/*.[c,cpp,h]
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      working-directory: ${{github.workspace}}/homework_1
+      run: cmake -B ${{github.workspace}}/homework_1/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      # Build your program with the given configuration
+      working-directory: ${{github.workspace}}/homework_1
+      run: cmake --build ${{github.workspace}}/homework_1/build --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/homework_1/build
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: Run valgrind
+      working-directory: ${{github.workspace}}/homework_1/build
+      run: valgrind --tool=memcheck --leak-check=yes ./tests/test_filter
+  
+  build_homework_1_with_sanitaizer:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+
+    # container: leshiy1295/gcc_linters
+    
+    steps:
+    - uses: actions/checkout@v3
+    - uses: lukka/get-cmake@latest
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      working-directory: ${{github.workspace}}/homework_1
+      run: cmake -DUSE_SANITIZER=ON -B ${{github.workspace}}/homework_1/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      # Build your program with the given configuration
+      working-directory: ${{github.workspace}}/homework_1
+      run: cmake --build ${{github.workspace}}/homework_1/build --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/homework_1/build
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+  build_homework_1_with_tests_report:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+
+    # container: leshiy1295/gcc_linters
+    
+    steps:
+    - uses: actions/checkout@v3
+    - uses: lukka/get-cmake@latest
+
+    - name: Apt install
+      run: sudo apt update && sudo apt install -y lcov
+
+    - name: Configure CMake
+      # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      working-directory: ${{github.workspace}}/homework_1
+      run: cmake -DWITH_COVERAGE=ON -B ${{github.workspace}}/homework_1/build -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}}
+
+    - name: Build
+      # Build your program with the given configuration
+      working-directory: ${{github.workspace}}/homework_1
+      run: cmake --build ${{github.workspace}}/homework_1/build --config ${{env.BUILD_TYPE}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/homework_1/build
+      # Execute tests defined by the CMake configuration.  
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{env.BUILD_TYPE}}
+
+    - name: Run lcov
+      working-directory: ${{github.workspace}}/homework_1/build
+      run: lcov -t "tests/test_filter" -o coverage.info -c -d filter_lib/ 
+
+    - name: Run genhtml
+      working-directory: ${{github.workspace}}/homework_1/build
+      run: genhtml -o report coverage.info
+
+    - name: Deploy test report 
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ${{github.workspace}}/homework_1/build/report
+      
