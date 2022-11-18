@@ -7,7 +7,7 @@ struct Matrix {
     int n_;
     double **a_;
 
-    Matrix(int m, int n) : m_{m}, n_{n} {
+    Matrix(int m, int n) : m_{m}, n_{n}, measurement_{0} {
         a_ = new double*[m_];
         for (int i = 0; i < m_; ++i) {
             a_[i] = new double[n_];
@@ -37,15 +37,15 @@ struct Matrix {
     Matrix GetRow(int i) {
         Matrix matr = Matrix(1, n_);
         for (int j = 0; j < n_; ++j) {
-            matr.SetElem(i, j, this->GetElem(i, j));
+            matr.SetElem(0, j, this->GetElem(i, j));
         }
         return matr;
     }
 
     Matrix GetColumn(int j) {
-        Matrix matr = Matrix(m_, 1);
+        Matrix matr = Matrix(1, m_);
         for (int i = 0; i < m_; ++i) {
-            matr.SetElem(i, j, this->GetElem(i, j));
+            matr.SetElem(0, i, this->GetElem(i, j));
         }
         return matr;
     }
@@ -60,6 +60,20 @@ struct Matrix {
         return matr;
     }
 
+    Matrix operator+(const Matrix matr) {
+        Matrix new_matr = Matrix(m_, n_);
+        if (m_ != matr.m_ || n_ != matr.n_) {
+            cout << "error\n";
+            return new_matr;
+        }
+        for (int i = 0; i < m_; ++i) {
+            for (int j = 0; j < n_; ++j) {
+                new_matr.SetElem(i, j, this->GetElem(i, j) + matr.a_[i][j]);
+            }
+        }
+        return new_matr;
+    }
+
     Matrix operator-(const double val) {
         Matrix matr = Matrix(m_, n_);
         for (int i = 0; i < m_; ++i) {
@@ -68,6 +82,20 @@ struct Matrix {
             }
         }
         return matr;
+    }
+
+    Matrix operator-(const Matrix matr) {
+        Matrix new_matr = Matrix(m_, n_);
+        if (m_ != matr.m_ || n_ != matr.n_) {
+            cout << "error\n";
+            return new_matr;
+        }
+        for (int i = 0; i < m_; ++i) {
+            for (int j = 0; j < n_; ++j) {
+                new_matr.SetElem(i, j, this->GetElem(i, j) - matr.a_[i][j]);
+            }
+        }
+        return new_matr;
     }
 
     Matrix operator*(const double val) {
@@ -80,6 +108,48 @@ struct Matrix {
         return matr;
     }
 
+    Matrix operator*(const Matrix matr) {
+        Matrix new_matr = Matrix(m_, n_);
+        if (n_ != matr.m_) {
+            cout << "error\n";
+            return new_matr;
+        }
+        int i = 0;
+        int j = 0;
+        int z = 0;
+        double val = 0;
+        while (j != n_) {
+            val += this->GetElem(i, z) * matr.a_[z][j];
+            ++z;
+            if (z == n_) {
+                new_matr.SetElem(i, j, val);
+                val = 0;
+                z = 0;
+                ++i;
+            }
+            if (i == m_) {
+                val = 0;
+                i = 0;
+                ++j;
+            }
+        }
+        return new_matr;
+    }
+
+    Matrix Multiply(const Matrix matr) {
+        Matrix new_matr = Matrix(m_, n_);
+        if (m_ != matr.m_ || n_ != matr.n_) {
+            cout << "error\n";
+            return new_matr;
+        }
+        for (int i = 0; i < m_; ++i) {
+            for (int j = 0; j < n_; ++j) {
+                new_matr.SetElem(i, j, this->GetElem(i, j) * matr.a_[i][j]);
+            }
+        }
+        return new_matr;
+    }
+
     Matrix operator/(const double val) {
         Matrix matr = Matrix(m_, n_);
         for (int i = 0; i < m_; ++i) {
@@ -90,10 +160,46 @@ struct Matrix {
         return matr;
     }
 
+    Matrix Devide(const Matrix matr) {
+        Matrix new_matr = Matrix(m_, n_);
+        if (m_ != matr.m_ || n_ != matr.n_) {
+            cout << "error\n";
+            return new_matr;
+        }
+        for (int i = 0; i < m_; ++i) {
+            for (int j = 0; j < n_; ++j) {
+                new_matr.SetElem(i, j, this->GetElem(i, j) / matr.a_[i][j]);
+            }
+        }
+        return new_matr;
+    }
+
+    Matrix operator[](const int i) {
+        if (measurement_ == 0) {
+            Matrix row = this->GetRow(i);
+            ++row.measurement_;
+            return row;
+        }
+        return this->GetColumn(i);
+    }
+
     Matrix &operator+=(const double val) {
         for (int i = 0; i < m_; ++i) {
             for (int j = 0; j < n_; ++j) {
                 this->SetElem(i, j, this->GetElem(i, j) + val);
+            }
+        }
+        return *this;
+    }
+
+    Matrix &operator+=(const Matrix matr) {
+        if (m_ != matr.m_ || n_ != matr.n_) {
+            cout << "error\n";
+            return *this;
+        }
+        for (int i = 0; i < m_; ++i) {
+            for (int j = 0; j < n_; ++j) {
+                this->SetElem(i, j, this->GetElem(i, j) + matr.a_[i][j]);
             }
         }
         return *this;
@@ -108,12 +214,62 @@ struct Matrix {
         return *this;
     }
 
+    Matrix &operator-=(const Matrix matr) {
+        if (m_ != matr.m_ || n_ != matr.n_) {
+            cout << "error\n";
+            return *this;
+        }
+        for (int i = 0; i < m_; ++i) {
+            for (int j = 0; j < n_; ++j) {
+                this->SetElem(i, j, this->GetElem(i, j) - matr.a_[i][j]);
+            }
+        }
+        return *this;
+    }
+
     Matrix &operator*=(const double val) {
         for (int i = 0; i < m_; ++i) {
             for (int j = 0; j < n_; ++j) {
                 this->SetElem(i, j, this->GetElem(i, j) * val);
             }
         }
+        return *this;
+    }
+
+    Matrix &operator*=(const Matrix matr) {
+        if (n_ != matr.m_) {
+            cout << "error\n";
+            return *this;
+        }
+
+        double tmp_a[m_][n_];
+
+        for (int i = 0; i < m_; ++i) {
+            for (int j = 0; j < n_; ++j) {
+                tmp_a[i][j] = this->GetElem(i, j);
+            }
+        }
+
+        int i = 0;
+        int j = 0;
+        int z = 0;
+        double val = 0;
+        while (j != n_) {
+            val += tmp_a[i][z] * matr.a_[z][j];
+            ++z;
+            if (z == n_) {
+                this->SetElem(i, j, val);
+                val = 0;
+                z = 0;
+                ++i;
+            }
+            if (i == m_) {
+                val = 0;
+                i = 0;
+                ++j;
+            }
+        }
+
         return *this;
     }
 
@@ -129,11 +285,12 @@ struct Matrix {
     Matrix(const Matrix &matr) {
         m_ = matr.m_;
         n_ = matr.n_;
+        measurement_ = matr.measurement_;
         a_ = new double*[m_];
         for (int i = 0; i < m_; ++i) {
             a_[i] = new double[n_];
             for (int j = 0; j < n_; ++j) {
-                a_[i][j] = 0;
+                a_[i][j] = matr.a_[i][j];
             }
         };
     }
@@ -151,11 +308,12 @@ struct Matrix {
 
         m_ = matr.m_;
         n_ = matr.n_;
+        measurement_ = matr.measurement_;
         a_ = new double*[m_];
         for (int i = 0; i < m_; ++i) {
             a_[i] = new double[n_];
             for (int j = 0; j < n_; ++j) {
-                a_[i][j] = 0;
+                a_[i][j] = matr.a_[i][j];
             }
         }
 
@@ -191,6 +349,19 @@ struct Matrix {
         }
         return matr;
     }
+
+    Matrix Transpose() {
+        Matrix matr = Matrix(n_, m_);
+        for (int i = 0; i < m_; ++i) {
+            for (int j = 0; j < n_; ++j) {
+                matr.SetElem(j, i, this->GetElem(i, j));
+            }
+        }
+        return matr;
+    }
+
+    private: 
+        int measurement_;
 };
 
 int main() {
@@ -260,6 +431,23 @@ int main() {
     matr *= 2;
     cout << "\n";
     matr.Print();
+    cout << "\n";
+
+    row = matr[1][1];
+    row.Print();
+    cout << "\n";
+
+    auto transpose_matr = matr.Transpose();
+    transpose_matr.Print();
+    cout << "\n";
+
+    auto matr_3 = matr * transpose_matr;
+    matr_3.Print();
+    cout << "\n";
+
+    matr *= transpose_matr;
+    matr.Print();
+    cout << "\n";
 
     return 0;
 }
